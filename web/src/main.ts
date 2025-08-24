@@ -190,16 +190,14 @@ class PostmanApp {
     if (this.response) {
       if (responseStatus) {
         let badgeClass = "info";
-        if (this.response.status >= 200 && this.response.status < 300) {
+        const status = NUmber(this.response.status);
+        if (status >= 200 && status < 300) {
           badgeClass = "success";
-        } else if (this.response.status >= 400 && this.response.status < 500) {
+        } else if (status >= 400 && status < 500) {
           badgeClass = "error";
-        } else if (this.response.status >= 500) {
+        } else if (status >= 500) {
           badgeClass = "error";
-        } else if (
-          this.response.status_text >= 300 &&
-          this.response.status_text < 400
-        ) {
+        } else if (status >= 300 && status < 400) {
           badgeClass = "warning";
         }
         responseStatus.innerHTML = `
