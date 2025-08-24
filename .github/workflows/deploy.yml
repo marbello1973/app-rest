@@ -1,52 +1,13 @@
-name: Deploy to GitHub Pages
-
+name: Deploy
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
-
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: "./web/package-lock.json"
-
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: wasm32-unknown-unknown
-          override: true
-
-      - name: Install wasm-pack
-        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-
-      - name: Install dependencies
-        run: |
-          cd web
-          npm install
-
-      - name: Build WASM
-        run: |
-          wasm-pack build --target web --release
-
-      - name: Build web app
-        run: |
-          cd web
-          npm run build
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        if: github.ref == 'refs/heads/main'
+      - uses: actions/checkout@v4
+      - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: /dist
+          publish_dir: ./dist
