@@ -49,6 +49,7 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
+          BASE_URL: "./app-rest" # ¡IMPORTANTE! Configura la base URL
 
       # 8. VERIFICAR que se creó web/dist/
       - name: Verify build output
