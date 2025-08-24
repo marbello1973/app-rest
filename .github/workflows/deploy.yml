@@ -1,13 +1,22 @@
-name: Deploy
+name: Deploy to GitHub Pages
+
 on:
   push:
     branches: [main]
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Esto es importante
     steps:
-      - uses: actions/checkout@v4
-      - uses: peaceiris/actions-gh-pages@v3
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0 # Importante para gh-pages
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }} # Usa GITHUB_TOKEN, no otro
           publish_dir: ./dist
