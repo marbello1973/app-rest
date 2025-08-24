@@ -5,67 +5,37 @@ on:
     branches: [main]
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
+      pages: write
+      id-token: write
     steps:
-      # 1. DESCARGAR EL CÓDIGO
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      # 2. CONFIGURAR NODE.JS (para el frontend en web/)
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
 
-      # 3. CONFIGURAR RUST (para el código WASM en src/)
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: wasm32-unknown-unknown
-          override: true
-
-      # 4. INSTALAR HERRAMIENTAS WASM
-      - name: Install wasm-pack
-        run: cargo install wasm-pack
-
-      # 5. INSTALAR DEPENDENCIAS DEL FRONTEND (web/)
-      - name: Install frontend dependencies
-        working-directory: web # ¡IMPORTANTE! Entra a la carpeta web/
-        run: npm install
-
-      # 6. CONSTRUIR EL WASM (desde la raíz)
-      - name: Build WASM module
-        run: wasm-pack build --target web --release
-
-      # 7. CONSTRUIR EL FRONTEND (web/)
-      - name: Build frontend
-        working-directory: web # ¡IMPORTANTE! Construye desde web/
-        run: npm run build
-        env:
-          NODE_ENV: production
-          BASE_URL: "./app-rest" # ¡IMPORTANTE! Configura la base URL
-
-      # 8. VERIFICAR que se creó web/dist/
-      - name: Verify build output
+      - name: Build with Vite
         run: |
-          echo "Contenido de web/dist/:"
-          ls -la web/dist/
-          if [ -f "web/dist/index.html" ]; then
-            echo "✅ ¡Build exitoso! index.html encontrado"
-          else
-            echo "❌ Error: index.html NO encontrado"
-            exit 1
-          fi
+          cd web
+          npm install
+          npm run build
 
-      # 9. DESPLEGAR A GitHub Pages
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./web/dist # ¡IMPORTANTE! Publica web/dist/
+          path: "./web/dist"
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
