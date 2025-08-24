@@ -17,6 +17,6 @@ export default defineConfig({
     target: "esnext",
     outDir: "dist",
   },
-  base: process.env.NODE_ENV === "produccion" ? "/app-rest" : "/",
+  base: "/app-wasm/",
   assetsInclude: ["**/*.wasm"],
 });
