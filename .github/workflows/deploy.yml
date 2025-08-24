@@ -8,15 +8,47 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Esto es importante
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Importante para gh-pages
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+          override: true
+
+      - name: Install dependencies
+        run: |
+          cd web
+          npm ci
+
+      - name: Build project
+        run: |
+          # Construir WASM
+          wasm-pack build --target web --release
+          # Construir frontend
+          cd web
+          npm run build
+
+      - name: List files for debugging
+        run: |
+          echo "=== Estructura de web/dist ==="
+          ls -la web/dist/
+          echo "=== Archivos en web/dist ==="  
+          find web/dist -type f -name "*.html" -o -name "*.js" -o -name "*.css"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }} # Usa GITHUB_TOKEN, no otro
-          publish_dir: ./dist
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./web/dist
