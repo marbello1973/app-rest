@@ -5,21 +5,24 @@ on:
     branches: [main]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Checkout
+      # 1. DESCARGAR EL CÓDIGO
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # 2. CONFIGURAR NODE.JS (para el frontend en web/)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
+      # 3. CONFIGURAR RUST (para el código WASM en src/)
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -27,22 +30,41 @@ jobs:
           target: wasm32-unknown-unknown
           override: true
 
+      # 4. INSTALAR HERRAMIENTAS WASM
       - name: Install wasm-pack
         run: cargo install wasm-pack
 
-      - name: Install web dependencies
-        working-directory: web
+      # 5. INSTALAR DEPENDENCIAS DEL FRONTEND (web/)
+      - name: Install frontend dependencies
+        working-directory: web # ¡IMPORTANTE! Entra a la carpeta web/
         run: npm install
 
-      - name: Build WASM
+      # 6. CONSTRUIR EL WASM (desde la raíz)
+      - name: Build WASM module
         run: wasm-pack build --target web --release
 
-      - name: Build web app
-        working-directory: web
+      # 7. CONSTRUIR EL FRONTEND (web/)
+      - name: Build frontend
+        working-directory: web # ¡IMPORTANTE! Construye desde web/
         run: npm run build
+        env:
+          NODE_ENV: production
 
+      # 8. VERIFICAR que se creó web/dist/
+      - name: Verify build output
+        run: |
+          echo "Contenido de web/dist/:"
+          ls -la web/dist/
+          if [ -f "web/dist/index.html" ]; then
+            echo "✅ ¡Build exitoso! index.html encontrado"
+          else
+            echo "❌ Error: index.html NO encontrado"
+            exit 1
+          fi
+
+      # 9. DESPLEGAR A GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./web/dist
+          publish_dir: ./web/dist # ¡IMPORTANTE! Publica web/dist/
