@@ -190,7 +190,7 @@ class PostmanApp {
     if (this.response) {
       if (responseStatus) {
         let badgeClass = "info";
-        const status = NUmber(this.response.status);
+        const status = Number(this.response.status);
         if (status >= 200 && status < 300) {
           badgeClass = "success";
         } else if (status >= 400 && status < 500) {
