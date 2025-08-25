@@ -18,49 +18,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Clonar repositorio
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Instalar Rust y wasm32
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: wasm32-unknown-unknown
-          override: true
-
-      # 3. Construir Wasm (carpeta pkg)
-      - name: Build WASM package
-        run: wasm-pack build --target web --out-dir pkg
-
-      # 4. Configurar Node.js (para Vite)
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # 5. Instalar dependencias y construir frontend
       - name: Install and Build Frontend
         working-directory: web
         run: |
           npm ci
           npm run build
 
-      # 6. Copiar pkg al dist final
       - name: Copy WASM pkg to dist
         run: cp -r pkg web/dist/pkg
 
-      # 7. Configurar GitHub Pages
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      # 8. Subir artefacto (dist de Vite)
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: web/dist
 
-      # 9. Desplegar
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
