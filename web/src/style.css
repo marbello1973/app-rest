@@ -127,3 +127,18 @@ textarea {
   min-height: 150px;
   resize: vertical;
 }
+
+@media (max-width: 768px) {
+  .request-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .response-content {
+    grid-template-columns: 1fr;
+  }
+
+  .response-info {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}

@@ -159,3 +159,18 @@ textarea {
 .status-badge.info {
   background-color: #2196f3;
 }
+
+@media (max-width: 768px) {
+  .request-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .response-content {
+    grid-template-columns: 1fr;
+  }
+
+  .response-info {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
