@@ -38,7 +38,7 @@ jobs:
         run: wasm-pack build --target web --release --out-dir ./src/pkg
 
       - name: Move wasm pkg into public directory
-        run: mv pkg web/public/pkg
+        run: mv src/pkg web/public/pkg
 
       - name: Install frontend dependencies
         working-directory: web
@@ -51,7 +51,7 @@ jobs:
           NODE_ENV: production
 
       - name: Copy WASM pkg into dist
-        run: cp -r pkg web/dist/pkg
+        run: cp -r src/pkg web/dist/pkg
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
