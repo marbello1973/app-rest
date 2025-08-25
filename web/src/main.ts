@@ -1,6 +1,6 @@
 //import { ApiClient } from "../../pkg/app_wasm";
 //import init, { main, ApiClient } from "../../pkg/app_wasm"; // para desarrollo en local descomentar
-import init, { main, ApiClient } from "./pkg/app_wasm"; // para subir a github pages descomentar en caso Uso
+import init, { main, ApiClient } from "./pkg/app_wasm.js"; // para subir a github pages descomentar en caso Uso
 import "../style.css";
 
 interface HttpHeader {
