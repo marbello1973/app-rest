@@ -3,6 +3,12 @@ import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@wasm": resiolve(__dirname, "src/pkg/app_wasm"),
+    },
+  },
+  base: "./",
   plugins: [wasm(), topLevelAwait()],
   server: {
     fs: {
