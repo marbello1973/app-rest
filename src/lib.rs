@@ -35,9 +35,10 @@ pub struct ApiClient;
 #[wasm_bindgen]
 impl ApiClient {
     pub async fn send_request(request: JsValue) -> Result<JsValue, JsValue> {
-        // Log the incoming request for debugging
+        // entrada para debugin
         log("Processing request...");
 
+        // validar la url
         let url = Url::parse(
             &serde_wasm_bindgen::from_value::<HttpRequest>(request.clone())
                 .map_err(|e| JsValue::from_str(&format!("Invalid request format: {:?}", e)))?
@@ -140,7 +141,7 @@ impl ApiClient {
                 let http_response = HttpResponse {
                     status,
                     status_text,
-                    headers: Vec::new(), // Simplificado por ahora
+                    headers: Vec::new(), // Simplificado por ahora mas adelante lo puedo expandir
                     body,
                     time: end_time - start_time,
                 };
