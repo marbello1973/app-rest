@@ -34,8 +34,8 @@ jobs:
       - name: Install wasm-pack
         run: cargo install wasm-pack
 
-      - name: Build WASM package
-        run: wasm-pack build --target web --release --out-dir pkg
+      - name: Build WASM
+        run: wasm-pack build --target web --release --out-dir ./src/pkg
 
       - name: Move wasm pkg into public directory
         run: mv pkg web/public/pkg
