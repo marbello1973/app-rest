@@ -5,15 +5,15 @@ on:
     branches: [main]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pages: write
-      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -30,28 +30,24 @@ jobs:
       - name: Install wasm-pack
         run: cargo install wasm-pack
 
+      # ¡PRIMERO construir WASM!
+      - name: Build WASM module
+        run: wasm-pack build --target web --release
+
+      # AHORA instalar dependencias del frontend
       - name: Install frontend dependencies
         working-directory: web
         run: npm install
 
-      - name: Build WASM module
-        run: wasm-pack build --target web --release
-
+      # FINALMENTE construir frontend
       - name: Build frontend
         working-directory: web
         run: npm run build
         env:
           NODE_ENV: production
-          BASE_URL: "/app-rest/" # ← Añade esta variable
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
-        with:
-          path: "./web/dist"
 
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./web/dist
