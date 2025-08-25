@@ -1,47 +1,70 @@
-name: Deploy GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [main]
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
     steps:
-      - name: Checkout repository
+      # 1. DESCARGAR EL CÓDIGO
+      - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Set up Node.js
+      # 2. CONFIGURAR NODE.JS (para el frontend en web/)
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20"
 
-      - name: Install and Build Frontend
-        working-directory: web
-        run: |
-          npm ci
-          npm run build
-
-      - name: Copy WASM pkg to dist
-        run: cp -r pkg web/dist/pkg
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      # 3. CONFIGURAR RUST (para el código WASM en src/)
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
         with:
-          path: web/dist
+          toolchain: stable
+          target: wasm32-unknown-unknown
+          override: true
 
+      # 4. INSTALAR HERRAMIENTAS WASM
+      - name: Install wasm-pack
+        run: cargo install wasm-pack
+
+      # 5. INSTALAR DEPENDENCIAS DEL FRONTEND (web/)
+      - name: Install frontend dependencies
+        working-directory: web # ¡IMPORTANTE! Entra a la carpeta web/
+        run: npm install
+
+      # 6. CONSTRUIR EL WASM (desde la raíz)
+      - name: Build WASM module
+        run: wasm-pack build --target web --release
+
+      # 7. CONSTRUIR EL FRONTEND (web/)
+      - name: Build frontend
+        working-directory: web # ¡IMPORTANTE! Construye desde web/
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      # 8. VERIFICAR que se creó web/dist/
+      - name: Verify build output
+        run: |
+          echo "Contenido de web/dist/:"
+          ls -la web/dist/
+          if [ -f "web/dist/index.html" ]; then
+            echo "✅ ¡Build exitoso! index.html encontrado"
+          else
+            echo "❌ Error: index.html NO encontrado"
+            exit 1
+          fi
+
+      # 9. DESPLEGAR A GitHub Pages
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./web/dist # ¡IMPORTANTE! Publica web/dist/
