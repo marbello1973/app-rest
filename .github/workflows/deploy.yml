@@ -31,11 +31,23 @@ jobs:
 
       - name: Build WASM
         working-directory: web
-        run: wasm-pack build --target web --release --out-dir ./src/pkg
+        run: wasm-pack build --target web --release
 
       - name: Install frontend dependencies
         working-directory: web
         run: npm install
+
+        # VERIFICAR que los archivos WASM existen
+      - name: Verify WASM files
+        run: |
+          echo "=== Archivos WASM en pkg/ ==="
+          ls -la pkg/
+          if [ -f "pkg/app_wasm.js" ]; then
+            echo "✅ app_wasm.js encontrado"
+          else
+            echo "❌ app_wasm.js NO encontrado"
+            exit 1
+          fi
 
       - name: Build frontend
         working-directory: web
