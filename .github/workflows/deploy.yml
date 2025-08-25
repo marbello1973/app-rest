@@ -51,7 +51,7 @@ jobs:
           NODE_ENV: production
 
       - name: Copy WASM pkg into dist
-        run: cp -r src/pkg web/dist/pkg
+        run: cp -r web/public/pkg web/dist/pkg
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
