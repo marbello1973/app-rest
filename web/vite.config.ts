@@ -5,10 +5,9 @@ import topLevelAwait from "vite-plugin-top-level-await";
 export default defineConfig({
   resolve: {
     alias: {
-      "@wasm": resiolve(__dirname, "src/pkg/app_wasm"),
+      "@wasm": resolve(__dirname, "src/pkg/app_wasm"),
     },
   },
-  base: "./",
   plugins: [wasm(), topLevelAwait()],
   server: {
     fs: {
@@ -23,6 +22,6 @@ export default defineConfig({
     target: "esnext",
     outDir: "dist",
   },
-  base: process.env.NODE_ENV === "production" ? "/app-rest/" : "/",
+  base: process.env.NODE_ENV === "production" ? "/app-rest/" : "./",
   assetsInclude: ["**/*.wasm"],
 });
