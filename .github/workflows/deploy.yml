@@ -37,6 +37,9 @@ jobs:
       - name: Build WASM package
         run: wasm-pack build --target web --release --out-dir pkg
 
+      - name: Move wasm pkg into public directory
+        run: mv pkg web/public/pkg
+
       - name: Install frontend dependencies
         working-directory: web
         run: npm install

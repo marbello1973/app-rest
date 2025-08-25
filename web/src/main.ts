@@ -1,5 +1,6 @@
-import { ApiClient } from "../../pkg/app_wasm";
-import init, { main } from "../../pkg/app_wasm";
+//import { ApiClient } from "../../pkg/app_wasm";
+import init, { main, ApiClient } from "../../pkg/app_wasm";
+import "../style.css";
 
 interface HttpHeader {
   key: string;

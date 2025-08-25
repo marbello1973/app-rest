@@ -17,6 +17,6 @@ export default defineConfig({
     target: "esnext",
     outDir: "dist",
   },
-  base: "/app-wasm/",
+  base: "/app-rest/",
   assetsInclude: ["**/*.wasm"],
 });
